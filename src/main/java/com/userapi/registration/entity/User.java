@@ -96,7 +96,7 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    Gender getGender() {
+    public Gender getGender() {
         return gender;
     }
 
