@@ -73,29 +73,21 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException ex, HttpServletRequest request) {
 
         String message = "Malformed JSON request";
-        String causeMessage = "Unknown";
-        // Get the root cause of the exception
-        Throwable specificCause = ex.getMostSpecificCause();
-        
-        if (specificCause != null && specificCause.getMessage() != null) {
-            causeMessage = specificCause.getMessage().toLowerCase();
+        String fullMessage = ex.getMessage() != null ? ex.getMessage() : "";
+        String lowerMessage = fullMessage.toLowerCase();
 
-            // Analyze the root cause message to determine the type of error
-            if (causeMessage.contains("localdate") || 
-                causeMessage.contains("dayofmonth") || 
-                causeMessage.contains("yearofera") ||
-                causeMessage.contains("datetimeparseexception")) {
-                message = "Invalid date format. Expected format: yyyy-MM-dd";
-            } 
-            else if (causeMessage.contains("gender") || causeMessage.contains("enum")) {
-                message = "Invalid gender value. Accepted values: MALE, FEMALE, OTHER (case insensitive)";
-            }
+        // Analyze the full message to determine the type of error
+        if (lowerMessage.contains("localdate")) {
+            message = "Invalid date format for 'birthdate'. Expected format: yyyy-MM-dd (example: 2000-01-15)";
+        } 
+        else if (lowerMessage.contains("gender") || lowerMessage.contains("enum")) {
+            message = "Invalid gender value. Accepted values: MALE, FEMALE, OTHER (case insensitive)";
         }
 
         logger.warn("JSON parse error on {}: UserMessage='{}' | TechnicalCause='{}'", 
             request.getRequestURI(), 
             message, 
-            causeMessage
+            fullMessage
         );
 
         return buildResponse(

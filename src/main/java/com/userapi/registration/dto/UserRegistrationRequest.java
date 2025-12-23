@@ -2,8 +2,6 @@ package com.userapi.registration.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.userapi.registration.entity.Gender;
-import com.userapi.registration.validation.AdultAge;
-import com.userapi.registration.validation.FrenchResident;
 import com.userapi.registration.validation.ValidPhoneNumber;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,12 +16,10 @@ public class UserRegistrationRequest {
     private String username;
 
     @NotNull(message = "Birthdate is required")
-    @AdultAge
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
     @NotBlank(message = "Country of residence is required")
-    @FrenchResident
     private String countryOfResidence;
 
     @ValidPhoneNumber
