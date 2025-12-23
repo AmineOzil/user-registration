@@ -1,5 +1,6 @@
 package com.userapi.registration.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.userapi.registration.entity.Gender;
 import com.userapi.registration.validation.AdultAge;
 import com.userapi.registration.validation.FrenchResident;
@@ -18,6 +19,7 @@ public class UserRegistrationRequest {
 
     @NotNull(message = "Birthdate is required")
     @AdultAge
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
     @NotBlank(message = "Country of residence is required")
@@ -28,6 +30,7 @@ public class UserRegistrationRequest {
     @Size(max = 20, message = "Phone number cannot exceed 20 characters")
     private String phoneNumber;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_VALUES)
     private Gender gender;
 
     public String getUsername() {
@@ -68,5 +71,16 @@ public class UserRegistrationRequest {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "UserRegistrationRequest{" +
+                "username='" + username + '\'' +
+                ", birthdate=" + birthdate +
+                ", countryOfResidence='" + countryOfResidence + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", gender=" + gender +
+                '}';
     }
 }

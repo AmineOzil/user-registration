@@ -11,6 +11,7 @@ public class ErrorResponse {
     private String message;
     private String errorCode;
     private String path;
+    private String correlationId;
     private Map<String, String> validationErrors;
 
     public ErrorResponse() {
@@ -71,6 +72,14 @@ public class ErrorResponse {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 
     public Map<String, String> getValidationErrors() {
