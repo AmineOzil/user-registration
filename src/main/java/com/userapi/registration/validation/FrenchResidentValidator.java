@@ -9,6 +9,9 @@ public class FrenchResidentValidator implements ConstraintValidator<FrenchReside
 
     @Override
     public boolean isValid(String country, ConstraintValidatorContext context) {
+        if (country == null || country.isBlank()) {
+            return true;
+        }
         return RegistrationPolicies.isFrenchResident(country);
     }
 }

@@ -11,6 +11,9 @@ public class AdultAgeValidator implements ConstraintValidator<AdultAge, LocalDat
 
     @Override
     public boolean isValid(LocalDate birthdate, ConstraintValidatorContext context) {
+        if (birthdate == null) {
+            return true;
+        }
         return RegistrationPolicies.isAdult(birthdate);
     }
 }
