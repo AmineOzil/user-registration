@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "user-registration-api",
+		"name": "User Registration API",
+		"description": "Collection for testing User Registration API endpoints with various scenarios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User Registration",
+			"item": [
+				{
+					"name": "Register Valid User - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has user data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('username');",
+									"    pm.expect(jsonData.username).to.eql('amine.bou');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Correlation-Id",
+								"value": "test-register-001"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"amine.bou\",\n  \"birthdate\": \"2000-01-15\",\n  \"countryOfResidence\": \"France\",\n  \"phoneNumber\": \"0612345678\",\n  \"gender\": \"MALE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Register a valid adult user from France with all fields"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Minimal Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Optional fields are null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.phoneNumber).to.be.null;",
+									"    pm.expect(jsonData.gender).to.be.null;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"claire.dubois\",\n  \"birthdate\": \"1995-06-20\",\n  \"countryOfResidence\": \"France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Register user with only required fields (phone and gender optional)"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Case Insensitive Gender",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"sarah.benali\",\n  \"birthdate\": \"1990-03-10\",\n  \"countryOfResidence\": \"France\",\n  \"gender\": \"female\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Gender is case-insensitive (female, FEMALE, Female all work)"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Under 18 (422)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Error code is age violation\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_RULE_AGE_MIN');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"young.user\",\n  \"birthdate\": \"2010-01-01\",\n  \"countryOfResidence\": \"France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Attempt to register user under 18 years old - should return 422"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Not France (422)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {",
+									"    pm.response.to.have.status(422);",
+									"});",
+									"",
+									"pm.test(\"Error code is country violation\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_RULE_COUNTRY_FR');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"foreign.user\",\n  \"birthdate\": \"1990-05-15\",\n  \"countryOfResidence\": \"Germany\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Attempt to register user from non-France country - should return 422"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Missing Required Fields (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Validation errors present\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_VALIDATION');",
+									"    pm.expect(jsonData).to.have.property('validationErrors');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"incomplete.user\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Missing required fields - should return 400 with validation errors"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Invalid Username Format (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Username validation error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.validationErrors).to.have.property('username');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"ab\",\n  \"birthdate\": \"2000-01-15\",\n  \"countryOfResidence\": \"France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Username too short (min 3 chars) - should return 400"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Invalid Date Format (400)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"JSON parse error\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_JSON_PARSE');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test.user\",\n  \"birthdate\": \"15/01/2000\",\n  \"countryOfResidence\": \"France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Invalid date format (should be yyyy-MM-dd) - returns 400"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User - Duplicate Username (409)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"pm.test(\"Error code is user exists\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_USER_ALREADY_EXISTS');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"amine.bou\",\n  \"birthdate\": \"1995-05-20\",\n  \"countryOfResidence\": \"France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Try to register with existing username - should return 409"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Retrieval",
+			"item": [
+				{
+					"name": "Get User by Username - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User data is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.username).to.eql('amine.bou');",
+									"    pm.expect(jsonData).to.have.property('birthdate');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Correlation-Id",
+								"value": "test-get-001"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/amine.bou",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"amine.bou"
+							]
+						},
+						"description": "Retrieve existing user details by username"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User - Not Found (404)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Error code is user not found\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.errorCode).to.eql('ERR_USER_NOT_FOUND');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/nonexistent.user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"nonexistent.user"
+							]
+						},
+						"description": "Try to get user that doesn't exist - should return 404"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
