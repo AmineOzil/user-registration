@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.userapi</groupId>
 	<artifactId>registration</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>registration</name>
 	<description>User registration API technical test</description>
 	<url/>
@@ -46,6 +46,14 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<!--Source - https://stackoverflow.com/a/79796353
+		// Posted by life888888, modified by community. See post 'Timeline' for change history
+		// Retrieved 2026-01-14, License - CC BY-SA 4.0-->
+
+		<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-h2console</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
