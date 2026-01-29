@@ -43,20 +43,22 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        validRequest = new UserRegistrationRequest();
-        validRequest.setUsername("amine.bou");
-        validRequest.setBirthdate(LocalDate.of(2000, 1, 1));
-        validRequest.setCountryOfResidence("France");
-        validRequest.setPhoneNumber("0612345678");
-        validRequest.setGender(Gender.MALE);
+        validRequest = UserRegistrationRequest.builder()
+                .username("amine.bou")
+                .birthdate(LocalDate.of(2000, 1, 1))
+                .countryOfResidence("France")
+                .phoneNumber("0612345678")
+                .gender(Gender.MALE)
+                .build();
 
-        savedUser = new User();
-        savedUser.setId(1L);
-        savedUser.setUsername("amine.bou");
-        savedUser.setBirthdate(LocalDate.of(2000, 1, 1));
-        savedUser.setCountryOfResidence("France");
-        savedUser.setPhoneNumber("0612345678");
-        savedUser.setGender(Gender.MALE);
+        savedUser = User.builder()
+                .id(1L)
+                .username("amine.bou")
+                .birthdate(LocalDate.of(2000, 1, 1))
+                .countryOfResidence("France")
+                .phoneNumber("0612345678")
+                .gender(Gender.MALE)
+                .build();
     }
 
     @Test

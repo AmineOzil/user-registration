@@ -1,0 +1,227 @@
+openapi: 3.0.1
+info:
+  title: User Registration API
+  description: REST API for user registration with validation and business rules enforcement
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@userapi.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /api/users:
+    post:
+      tags:
+        - User Registration
+      summary: Register a new user
+      description: Creates a new user account with validation of age (18+) and country (France only)
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+            examples:
+              validRequest:
+                summary: Valid registration request
+                value:
+                  username: amine.bou
+                  birthdate: "2000-01-15"
+                  countryOfResidence: France
+                  phoneNumber: "0612345678"
+                  gender: MALE
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              examples:
+                success:
+                  summary: Successful registration
+                  value:
+                    id: 1
+                    username: amine.bou
+                    birthdate: "2000-01-15"
+                    countryOfResidence: France
+                    phoneNumber: "0612345678"
+                    gender: MALE
+        '400':
+          description: Validation error (invalid format, missing required fields)
+          content:
+            application/json:
+              examples:
+                validationError:
+                  summary: Missing required fields
+                  value:
+                    status: 400
+                    error: Bad Request
+                    message: Input validation failed
+                    path: /api/users
+                    errorCode: ERR_VALIDATION
+                    timestamp: "2025-12-24T10:08:32"
+                    correlationId: test-123
+                    validationErrors:
+                      username: Username is required
+                      birthdate: Birthdate is required
+        '409':
+          description: Username already exists
+          content:
+            application/json:
+              examples:
+                conflict:
+                  summary: Username already taken
+                  value:
+                    status: 409
+                    error: Conflict
+                    message: "User with username 'amine.bou' already exists"
+                    path: /api/users
+                    errorCode: ERR_USER_ALREADY_EXISTS
+                    timestamp: "2025-12-24T10:15:58"
+                    correlationId: abc-123
+        '422':
+          description: Business rule violation (user under 18 or not French resident)
+          content:
+            application/json:
+              examples:
+                underAge:
+                  summary: User under 18
+                  value:
+                    status: 422
+                    error: Unprocessable Content
+                    message: User must be at least 18 years old
+                    path: /api/users
+                    errorCode: ERR_RULE_AGE_MIN
+                    timestamp: "2025-12-24T10:10:36"
+                    correlationId: test-123
+                notFrenchResident:
+                  summary: Not French resident
+                  value:
+                    status: 422
+                    error: Unprocessable Content
+                    message: Only French residents can register
+                    path: /api/users
+                    errorCode: ERR_RULE_COUNTRY_FR
+                    timestamp: "2025-12-24T10:12:45"
+                    correlationId: test-456
+
+  /api/users/{username}:
+    get:
+      tags:
+        - User Registration
+      summary: Get user details
+      description: Retrieves user information by username
+      operationId: getUserDetails
+      parameters:
+        - name: username
+          in: path
+          description: Username to retrieve
+          required: true
+          schema:
+            type: string
+            example: amine.bou
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              examples:
+                userDetails:
+                  summary: User details
+                  value:
+                    id: 1
+                    username: amine.bou
+                    birthdate: "2000-01-15"
+                    countryOfResidence: France
+                    phoneNumber: "0612345678"
+                    gender: MALE
+        '404':
+          description: User not found
+          content:
+            application/json:
+              examples:
+                notFound:
+                  summary: User not found
+                  value:
+                    status: 404
+                    error: Not Found
+                    message: "User with username 'nonexistent.user' not found"
+                    path: /api/users/nonexistent.user
+                    errorCode: ERR_USER_NOT_FOUND
+                    timestamp: "2025-12-24T10:17:06"
+                    correlationId: xyz-789
+
+components:
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - username
+        - birthdate
+        - countryOfResidence
+      properties:
+        username:
+          type: string
+          description: Unique username (3-50 characters, alphanumeric with dots/underscores)
+          minLength: 3
+          maxLength: 50
+          example: amine.bou
+        birthdate:
+          type: string
+          format: date
+          description: User's date of birth (must be 18+ years old)
+          example: "2000-01-15"
+        countryOfResidence:
+          type: string
+          description: Country of residence (only 'France' accepted)
+          example: France
+        phoneNumber:
+          type: string
+          description: Phone number (optional, minimum 10 digits, can start with +)
+          maxLength: 20
+          example: "0612345678"
+        gender:
+          type: string
+          description: Gender (optional, case insensitive)
+          enum:
+            - MALE
+            - FEMALE
+            - OTHER
+          example: MALE
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User's unique identifier
+          example: 1
+        username:
+          type: string
+          description: User's username
+          example: amine.bou
+        birthdate:
+          type: string
+          format: date
+          description: User's date of birth
+          example: "2000-01-15"
+        countryOfResidence:
+          type: string
+          description: User's country of residence
+          example: France
+        phoneNumber:
+          type: string
+          description: User's phone number
+          example: "0612345678"
+        gender:
+          type: string
+          description: User's gender
+          example: MALE

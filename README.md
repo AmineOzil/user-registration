@@ -34,6 +34,7 @@ A Spring Boot REST API for user registration with validation, business rules enf
 - **Spring Validation**: Jakarta Bean Validation
 - **Spring AOP**: Aspect-oriented logging
 - **H2 Database**: In-memory database
+- **SpringDoc OpenAPI**: API documentation (Swagger UI)
 - **JUnit 5 & Mockito**: Testing
 - **JaCoCo**: Code coverage
 - **Maven**: Build tool
@@ -70,6 +71,19 @@ mvnw.cmd spring-boot:run
 ```
 
 The application will start on `http://localhost:8080`
+
+### Access API Documentation
+
+Once the application is running, you can access the interactive API documentation:
+
+- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **OpenAPI JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+The Swagger UI provides an interactive interface to:
+- View all available endpoints
+- Test API requests directly from the browser
+- See request/response schemas and examples
+- Explore error codes and validation rules
 
 ### Run tests and JaCoCo coverage
 
@@ -378,8 +392,8 @@ logging.level.com.userapi.registration.aspect=DEBUG
 | 400 | ERR_JSON_PARSE | Invalid JSON format |
 | 404 | ERR_USER_NOT_FOUND | Requested user doesn't exist |
 | 409 | ERR_USER_ALREADY_EXISTS | Username conflict |
-| 422 | ERR_RULE_AGE_MIN | User under 18 years old |
-| 422 | ERR_RULE_COUNTRY_FR | User not resident of France |
+| 422 | ERR_RULE_AGE_MIN | User must be at least 18 years old |
+| 422 | ERR_RULE_COUNTRY_FR | Only French residents can register |
 | 500 | ERR_INTERNAL | Unexpected server error |
 
 ---

@@ -35,12 +35,13 @@ class UserServiceIntegrationTest {
     void setUp() {
         userRepository.deleteAll();
 
-        validRequest = new UserRegistrationRequest();
-        validRequest.setUsername("amine.bou");
-        validRequest.setBirthdate(LocalDate.of(2000, 1, 1));
-        validRequest.setCountryOfResidence("France");
-        validRequest.setPhoneNumber("0612345678");
-        validRequest.setGender(Gender.MALE);
+        validRequest = UserRegistrationRequest.builder()
+                .username("amine.bou")
+                .birthdate(LocalDate.of(2000, 1, 1))
+                .countryOfResidence("France")
+                .phoneNumber("0612345678")
+                .gender(Gender.MALE)
+                .build();
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.userapi.registration.exception.UserAlreadyExistsException;
 import com.userapi.registration.exception.UserNotAdultException;
 import com.userapi.registration.exception.UserNotFoundException;
 import com.userapi.registration.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +19,10 @@ import java.time.LocalDate;
  * Service handling user registration and retrieval operations.
  */
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * Registers a new user after validating business rules.
@@ -43,12 +41,13 @@ public class UserService {
             throw new UserAlreadyExistsException(request.getUsername());
         }
 
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setBirthdate(request.getBirthdate());
-        user.setCountryOfResidence(request.getCountryOfResidence());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setGender(request.getGender());
+        User user = User.builder()
+                .username(request.getUsername())
+                .birthdate(request.getBirthdate())
+                .countryOfResidence(request.getCountryOfResidence())
+                .phoneNumber(request.getPhoneNumber())
+                .gender(request.getGender())
+                .build();
 
         User savedUser = userRepository.save(user);
 
@@ -64,21 +63,20 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserResponse getUserDetails(String username) {
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new UserNotFoundException(username));
-
-        return mapToResponse(user);
     }
 
     private UserResponse mapToResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getBirthdate(),
-                user.getCountryOfResidence(),
-                user.getPhoneNumber(),
-                user.getGender()
-        );
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .birthdate(user.getBirthdate())
+                .countryOfResidence(user.getCountryOfResidence())
+                .phoneNumber(user.getPhoneNumber())
+                .gender(user.getGender())
+                .build();
     }
 
     private void validateBusinessRules(UserRegistrationRequest request) {
